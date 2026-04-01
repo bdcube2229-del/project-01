@@ -1,63 +1,207 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <title>고재윤 소개 페이지</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #0f172a;
-            color: #e2e8f0;
-            text-align: center;
-            padding: 50px;
-        }
+<meta charset="UTF-8">
+<title>나의 학습 기록</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-        .card {
-            background-color: #1e293b;
-            padding: 30px;
-            border-radius: 15px;
-            width: 380px;
-            margin: auto;
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
-        }
+<style>
+body {
+    font-family: Arial;
+    background: #0f172a;
+    color: #e2e8f0;
+    text-align: center;
+    padding: 30px;
+}
 
-        h1 {
-            color: #38bdf8;
-        }
+.container {
+    max-width: 500px;
+    margin: auto;
+}
 
-        p {
-            font-size: 16px;
-            margin: 10px 0;
-            line-height: 1.5;
-        }
+.card {
+    background: #1e293b;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+}
 
-        .intro {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #334155;
-            border-radius: 10px;
-            text-align: left;
-        }
-    </style>
+input, button {
+    padding: 8px;
+    margin: 5px;
+    border-radius: 6px;
+    border: none;
+}
+
+button {
+    background: #38bdf8;
+    color: black;
+    cursor: pointer;
+}
+
+ul {
+    text-align: left;
+}
+
+.progress {
+    margin-top: 10px;
+}
+</style>
 </head>
+
 <body>
 
+<div class="container">
+
+    <h1>📘 학습 & 습관 기록</h1>
+
+    <!-- 날짜 -->
     <div class="card">
-        <h1>👨‍💻 고재윤</h1>
-        <p>📚 1학년 5반 2번</p>
-
-        <div class="intro">
-            <p><strong>자기소개</strong></p>
-            <p>
-                중학교 1학년 때부터 컴퓨터 코딩에 관심을 가지게 되었습니다.<br>
-                중학교 3학년 때는 잠시 공백기간이 있었지만,<br>
-                현재 판교고등학교에 입학하면서 다시 코딩 공부를 시작했습니다.<br>
-                현재는 Python과 C언어를 독학하며 실력을 키우고 있습니다.
-            </p>
-        </div>
-
-        <p style="margin-top:20px;">🚀 GitHub에 오신 것을 환영합니다!</p>
+        <input type="date" id="date">
     </div>
+
+    <!-- 할 일 -->
+    <div class="card">
+        <h3>✅ 오늘 할 일</h3>
+        <input type="text" id="todoInput" placeholder="할 일 입력">
+        <button onclick="addTodo()">추가</button>
+        <ul id="todoList"></ul>
+    </div>
+
+    <!-- 습관 -->
+    <div class="card">
+        <h3>🔥 습관 체크</h3>
+        <label><input type="checkbox" class="habit"> 코딩 공부</label><br>
+        <label><input type="checkbox" class="habit"> 운동</label><br>
+        <label><input type="checkbox" class="habit"> 복습</label><br>
+
+        <div class="progress">
+            달성률: <span id="rate">0%</span>
+        </div>
+    </div>
+
+    <!-- 공부 시간 -->
+    <div class="card">
+        <h3>⏱ 공부 시간 (시간)</h3>
+        <input type="number" id="studyTime">
+        <button onclick="saveStudy()">저장</button>
+    </div>
+
+    <!-- 그래프 -->
+    <div class="card">
+        <h3>📊 공부 시간 그래프</h3>
+        <canvas id="chart"></canvas>
+    </div>
+
+</div>
+
+<script>
+let todos = JSON.parse(localStorage.getItem("todos")) || {};
+let studyData = JSON.parse(localStorage.getItem("study")) || {};
+
+function getDate() {
+    return document.getElementById("date").value;
+}
+
+// 할 일 추가
+function addTodo() {
+    const date = getDate();
+    const input = document.getElementById("todoInput");
+
+    if (!todos[date]) todos[date] = [];
+    todos[date].push({text: input.value, done: false});
+
+    input.value = "";
+    saveTodos();
+    renderTodos();
+}
+
+function saveTodos() {
+    localStorage.setItem("todos", JSON.stringify(todos));
+}
+
+// 할 일 표시
+function renderTodos() {
+    const date = getDate();
+    const list = document.getElementById("todoList");
+    list.innerHTML = "";
+
+    if (!todos[date]) return;
+
+    todos[date].forEach((todo, i) => {
+        const li = document.createElement("li");
+        li.innerHTML = `
+            <input type="checkbox" ${todo.done ? "checked":""}
+            onchange="toggleTodo(${i})">
+            ${todo.text}
+        `;
+        list.appendChild(li);
+    });
+}
+
+function toggleTodo(i) {
+    const date = getDate();
+    todos[date][i].done = !todos[date][i].done;
+    saveTodos();
+}
+
+// 습관 달성률
+document.querySelectorAll(".habit").forEach(cb => {
+    cb.addEventListener("change", () => {
+        const habits = document.querySelectorAll(".habit");
+        let checked = 0;
+
+        habits.forEach(h => { if (h.checked) checked++; });
+
+        let rate = Math.round((checked / habits.length) * 100);
+        document.getElementById("rate").innerText = rate + "%";
+    });
+});
+
+// 공부 시간 저장
+function saveStudy() {
+    const date = getDate();
+    const time = document.getElementById("studyTime").value;
+
+    studyData[date] = time;
+    localStorage.setItem("study", JSON.stringify(studyData));
+
+    drawChart();
+}
+
+// 그래프
+let chart;
+
+function drawChart() {
+    const ctx = document.getElementById("chart");
+
+    const labels = Object.keys(studyData);
+    const data = Object.values(studyData);
+
+    if (chart) chart.destroy();
+
+    chart = new Chart(ctx, {
+        type: "line",
+        data: {
+            labels: labels,
+            datasets: [{
+                label: "공부 시간",
+                data: data,
+                fill: false,
+                tension: 0.3
+            }]
+        }
+    });
+}
+
+// 날짜 변경 시
+document.getElementById("date").addEventListener("change", () => {
+    renderTodos();
+});
+
+// 초기 실행
+drawChart();
+</script>
 
 </body>
 </html>
