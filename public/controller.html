@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#08090c" />
+    <title>PHONE AIM — 휴대폰</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body class="controller-page">
+    <main class="controller-shell">
+      <header class="controller-header"><div><span class="eyebrow">PHONE AIM / CONTROLLER</span><h1>화면 조준기</h1></div><span class="connection-chip" id="connectionChip">연결 확인 중</span></header>
+      <section class="camera-stage" id="cameraStage">
+        <video id="camera" playsinline muted></video><canvas id="analysisCanvas" width="320" height="240"></canvas><canvas id="overlayCanvas"></canvas>
+        <div class="camera-empty" id="cameraEmpty"><div class="camera-icon" aria-hidden="true"></div><strong>화면의 네 모서리가 모두 보이게 잡아주세요</strong><span>카메라 정중앙이 가리키는 곳을 계산합니다.</span></div>
+        <div class="crosshair" aria-hidden="true"><i></i><i></i></div><div class="detect-status" id="detectStatus">기준점 0 / 4</div>
+      </section>
+      <section class="controller-panel">
+        <div class="meter-row"><div><span>화면 X</span><strong id="phoneX">50.0</strong></div><div><span>화면 Y</span><strong id="phoneY">50.0</strong></div><div><span>신뢰도</span><strong id="confidence">0%</strong></div></div>
+        <p class="notice" id="secureNotice" hidden>로컬 HTTP에서는 브라우저가 실시간 카메라를 막을 수 있습니다. 아래 ‘사진으로 한 번 측정’ 또는 시뮬레이션으로 좌표 계산을 먼저 확인하세요.</p>
+        <div class="controller-actions"><button id="startCamera" class="primary-button" type="button">카메라 시작</button><label class="ghost-button file-button">사진으로 한 번 측정<input id="photoInput" type="file" accept="image/*" capture="environment" /></label></div>
+        <details class="simulator"><summary>카메라 없이 시뮬레이션</summary><p>아래 패드를 드래그하면 화면의 조준점이 움직입니다.</p><div class="sim-pad" id="simPad"><span id="simDot"></span></div></details>
+      </section>
+    </main>
+    <script src="/controller.js"></script>
+  </body>
+</html>
