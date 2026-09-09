@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#08090c" />
+    <title>PHONE AIM — 화면</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body class="display-page">
+    <main class="arena" id="arena">
+      <div class="grid" aria-hidden="true"></div>
+
+      <div class="marker marker-tl" data-marker="TL">
+        <span>TL</span>
+      </div>
+      <div class="marker marker-tr" data-marker="TR">
+        <span>TR</span>
+      </div>
+      <div class="marker marker-br" data-marker="BR">
+        <span>BR</span>
+      </div>
+      <div class="marker marker-bl" data-marker="BL">
+        <span>BL</span>
+      </div>
+
+      <div class="aim is-waiting" id="aim" aria-label="휴대폰 조준 위치">
+        <span class="aim-ring"></span>
+        <span class="aim-dot"></span>
+      </div>
+
+      <section class="display-panel" id="connectPanel">
+        <div class="eyebrow"><span class="live-pip"></span> PHONE AIM / PROTOTYPE 01</div>
+        <h1>휴대폰으로<br />이 화면을 겨눠보세요</h1>
+        <p>휴대폰과 이 컴퓨터를 같은 Wi‑Fi에 연결한 뒤 아래 QR을 스캔하세요.</p>
+        <div class="connect-row">
+          <div class="qr-shell">
+            <img id="qrImage" alt="휴대폰 연결 QR 코드" />
+            <span id="qrFallback">QR 불러오는 중</span>
+          </div>
+          <div class="link-block">
+            <span>휴대폰 주소</span>
+            <strong id="controllerUrl">주소 확인 중…</strong>
+            <button id="copyLink" class="text-button" type="button">주소 복사</button>
+          </div>
+        </div>
+        <div class="panel-actions">
+          <button id="fullscreenButton" class="primary-button" type="button">전체 화면으로 시작</button>
+          <button id="hidePanel" class="ghost-button" type="button">안내 숨기기</button>
+        </div>
+      </section>
+
+      <button id="showPanel" class="corner-button is-hidden" type="button">연결 안내</button>
+
+      <footer class="status-bar">
+        <div>
+          <span class="status-light" id="statusLight"></span>
+          <strong id="statusText">휴대폰 연결 대기</strong>
+        </div>
+        <div class="coordinates"><span>X <b id="xValue">50</b></span><span>Y <b id="yValue">50</b></span></div>
+      </footer>
+    </main>
+    <script src="/display.js"></script>
+  </body>
+</html>
