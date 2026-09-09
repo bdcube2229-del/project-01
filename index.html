@@ -1,207 +1,65 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
-<head>
-<meta charset="UTF-8">
-<title>나의 학습 기록</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#08090c" />
+    <title>PHONE AIM — 화면</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body class="display-page">
+    <main class="arena" id="arena">
+      <div class="grid" aria-hidden="true"></div>
 
-<style>
-body {
-    font-family: Arial;
-    background: #0f172a;
-    color: #e2e8f0;
-    text-align: center;
-    padding: 30px;
-}
+      <div class="marker marker-tl" data-marker="TL">
+        <span>TL</span>
+      </div>
+      <div class="marker marker-tr" data-marker="TR">
+        <span>TR</span>
+      </div>
+      <div class="marker marker-br" data-marker="BR">
+        <span>BR</span>
+      </div>
+      <div class="marker marker-bl" data-marker="BL">
+        <span>BL</span>
+      </div>
 
-.container {
-    max-width: 500px;
-    margin: auto;
-}
+      <div class="aim is-waiting" id="aim" aria-label="휴대폰 조준 위치">
+        <span class="aim-ring"></span>
+        <span class="aim-dot"></span>
+      </div>
 
-.card {
-    background: #1e293b;
-    padding: 20px;
-    border-radius: 12px;
-    margin-bottom: 20px;
-}
-
-input, button {
-    padding: 8px;
-    margin: 5px;
-    border-radius: 6px;
-    border: none;
-}
-
-button {
-    background: #38bdf8;
-    color: black;
-    cursor: pointer;
-}
-
-ul {
-    text-align: left;
-}
-
-.progress {
-    margin-top: 10px;
-}
-</style>
-</head>
-
-<body>
-
-<div class="container">
-
-    <h1>📘 학습 & 습관 기록</h1>
-
-    <!-- 날짜 -->
-    <div class="card">
-        <input type="date" id="date">
-    </div>
-
-    <!-- 할 일 -->
-    <div class="card">
-        <h3>✅ 오늘 할 일</h3>
-        <input type="text" id="todoInput" placeholder="할 일 입력">
-        <button onclick="addTodo()">추가</button>
-        <ul id="todoList"></ul>
-    </div>
-
-    <!-- 습관 -->
-    <div class="card">
-        <h3>🔥 습관 체크</h3>
-        <label><input type="checkbox" class="habit"> 코딩 공부</label><br>
-        <label><input type="checkbox" class="habit"> 운동</label><br>
-        <label><input type="checkbox" class="habit"> 복습</label><br>
-
-        <div class="progress">
-            달성률: <span id="rate">0%</span>
+      <section class="display-panel" id="connectPanel">
+        <div class="eyebrow"><span class="live-pip"></span> PHONE AIM / PROTOTYPE 01</div>
+        <h1>휴대폰으로<br />이 화면을 겨눠보세요</h1>
+        <p>휴대폰과 이 컴퓨터를 같은 Wi‑Fi에 연결한 뒤 아래 QR을 스캔하세요.</p>
+        <div class="connect-row">
+          <div class="qr-shell">
+            <img id="qrImage" alt="휴대폰 연결 QR 코드" />
+            <span id="qrFallback">QR 불러오는 중</span>
+          </div>
+          <div class="link-block">
+            <span>휴대폰 주소</span>
+            <strong id="controllerUrl">주소 확인 중…</strong>
+            <button id="copyLink" class="text-button" type="button">주소 복사</button>
+          </div>
         </div>
-    </div>
+        <div class="panel-actions">
+          <button id="fullscreenButton" class="primary-button" type="button">전체 화면으로 시작</button>
+          <button id="hidePanel" class="ghost-button" type="button">안내 숨기기</button>
+        </div>
+      </section>
 
-    <!-- 공부 시간 -->
-    <div class="card">
-        <h3>⏱ 공부 시간 (시간)</h3>
-        <input type="number" id="studyTime">
-        <button onclick="saveStudy()">저장</button>
-    </div>
+      <button id="showPanel" class="corner-button is-hidden" type="button">연결 안내</button>
 
-    <!-- 그래프 -->
-    <div class="card">
-        <h3>📊 공부 시간 그래프</h3>
-        <canvas id="chart"></canvas>
-    </div>
-
-</div>
-
-<script>
-let todos = JSON.parse(localStorage.getItem("todos")) || {};
-let studyData = JSON.parse(localStorage.getItem("study")) || {};
-
-function getDate() {
-    return document.getElementById("date").value;
-}
-
-// 할 일 추가
-function addTodo() {
-    const date = getDate();
-    const input = document.getElementById("todoInput");
-
-    if (!todos[date]) todos[date] = [];
-    todos[date].push({text: input.value, done: false});
-
-    input.value = "";
-    saveTodos();
-    renderTodos();
-}
-
-function saveTodos() {
-    localStorage.setItem("todos", JSON.stringify(todos));
-}
-
-// 할 일 표시
-function renderTodos() {
-    const date = getDate();
-    const list = document.getElementById("todoList");
-    list.innerHTML = "";
-
-    if (!todos[date]) return;
-
-    todos[date].forEach((todo, i) => {
-        const li = document.createElement("li");
-        li.innerHTML = `
-            <input type="checkbox" ${todo.done ? "checked":""}
-            onchange="toggleTodo(${i})">
-            ${todo.text}
-        `;
-        list.appendChild(li);
-    });
-}
-
-function toggleTodo(i) {
-    const date = getDate();
-    todos[date][i].done = !todos[date][i].done;
-    saveTodos();
-}
-
-// 습관 달성률
-document.querySelectorAll(".habit").forEach(cb => {
-    cb.addEventListener("change", () => {
-        const habits = document.querySelectorAll(".habit");
-        let checked = 0;
-
-        habits.forEach(h => { if (h.checked) checked++; });
-
-        let rate = Math.round((checked / habits.length) * 100);
-        document.getElementById("rate").innerText = rate + "%";
-    });
-});
-
-// 공부 시간 저장
-function saveStudy() {
-    const date = getDate();
-    const time = document.getElementById("studyTime").value;
-
-    studyData[date] = time;
-    localStorage.setItem("study", JSON.stringify(studyData));
-
-    drawChart();
-}
-
-// 그래프
-let chart;
-
-function drawChart() {
-    const ctx = document.getElementById("chart");
-
-    const labels = Object.keys(studyData);
-    const data = Object.values(studyData);
-
-    if (chart) chart.destroy();
-
-    chart = new Chart(ctx, {
-        type: "line",
-        data: {
-            labels: labels,
-            datasets: [{
-                label: "공부 시간",
-                data: data,
-                fill: false,
-                tension: 0.3
-            }]
-        }
-    });
-}
-
-// 날짜 변경 시
-document.getElementById("date").addEventListener("change", () => {
-    renderTodos();
-});
-
-// 초기 실행
-drawChart();
-</script>
-
-</body>
+      <footer class="status-bar">
+        <div>
+          <span class="status-light" id="statusLight"></span>
+          <strong id="statusText">휴대폰 연결 대기</strong>
+        </div>
+        <div class="coordinates"><span>X <b id="xValue">50</b></span><span>Y <b id="yValue">50</b></span></div>
+      </footer>
+    </main>
+    <script src="/display.js"></script>
+  </body>
 </html>
